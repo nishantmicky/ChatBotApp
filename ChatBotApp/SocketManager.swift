@@ -9,6 +9,7 @@ import Foundation
 
 protocol SocketManagerDelegate: AnyObject {
     func didReceiveMessage(_ message: String)
+    func didReceiveSocketError(_ error: String)
 }
 
 class SocketManager {
@@ -16,9 +17,12 @@ class SocketManager {
     weak var delegate: SocketManagerDelegate?
 
     private var webSocketTask: URLSessionWebSocketTask?
+    var isConnected: Bool {
+        return webSocketTask?.state == .running
+    }
 
-    func connect() {
-        guard let url = URL(string: "wss://s14572.blr1.piesocket.com/v3/1?api_key=ddi6BaZ68o30yx2W6alIsJKFiPIk2iz3jl8amNwa") else { return }
+    public func connect() {
+        guard let url = URL(string: PIE_SOCKET_URL) else { return }
         let request = URLRequest(url: url)
         webSocketTask = URLSession.shared.webSocketTask(with: request)
         webSocketTask?.resume()
@@ -29,16 +33,20 @@ class SocketManager {
         webSocketTask?.receive { [weak self] result in
             switch result {
             case .success(.string(let message)):
-                    DispatchQueue.main.async {
-                        self?.delegate?.didReceiveMessage(message)
-                    }
+                print("Socket success of type string: \(message)")
+                DispatchQueue.main.async {
+                    self?.delegate?.didReceiveMessage(message)
+                }
                 self?.listen()
-            case .success(.data(_)):
-                // no-op
-            case .success(_):
-                // no-op
+            case .success(.data(let data)):
+                print("Socket success of type data: \(data)")
+            case .success(let data):
+                print("Socket success: \(data)")
             case .failure(let error):
                 print("Socket error: \(error)")
+                DispatchQueue.main.async {
+                    self?.delegate?.didReceiveSocketError("Socket error: \(error.localizedDescription)")
+                }
             }
         }
     }
@@ -47,6 +55,9 @@ class SocketManager {
         webSocketTask?.send(.string(message)) { error in
             if let error = error {
                 print("Send error: \(error)")
+                DispatchQueue.main.async {
+                    self.delegate?.didReceiveSocketError("Send error: \(error.localizedDescription)")
+                }
             }
         }
     }

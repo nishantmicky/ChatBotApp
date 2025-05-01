@@ -26,7 +26,7 @@ class ChatCell: UITableViewCell {
         backgroundColor = .clear
 
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
-        avatarImageView.image = UIImage(systemName: "message.circle")
+        avatarImageView.image = UIImage(systemName: AVATAR_IMAGE_NAME)
         avatarImageView.tintColor = .gray
         avatarImageView.layer.cornerRadius = 16
         avatarImageView.clipsToBounds = true
@@ -42,7 +42,7 @@ class ChatCell: UITableViewCell {
         statusImageView.translatesAutoresizingMaskIntoConstraints = false
         statusImageView.tintColor = .red
         statusImageView.contentMode = .scaleAspectFit
-        statusImageView.image = UIImage(systemName: "exclamationmark.circle.fill")
+        statusImageView.image = UIImage(systemName: MESSAGE_SENT_STATUS_IMAGE_NAME)
 
         bubbleView.addSubview(messageLabel)
         contentView.addSubview(bubbleView)
@@ -92,16 +92,17 @@ class ChatCell: UITableViewCell {
         statusToContentLeading.isActive = false
 
         if isUser {
-            bubbleView.backgroundColor = .systemBlue
             messageLabel.textColor = .white
             avatarImageView.isHidden = true
             trailingBubbleConstraint.isActive = true
-            
-            if !isFailed {
+            if isFailed {
                 statusImageView.isHidden = false
                 statusToBubbleLeading.isActive = true
+                let lightBlue = UIColor(red: 0.45, green: 0.65, blue: 1.0, alpha: 1.0)
+                bubbleView.backgroundColor = lightBlue
             } else {
                 statusImageView.isHidden = true
+                bubbleView.backgroundColor = .systemBlue
             }
         } else {
             bubbleView.backgroundColor = .systemGray5
