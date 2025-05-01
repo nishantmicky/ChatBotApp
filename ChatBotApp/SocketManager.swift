@@ -7,11 +7,16 @@
 
 import Foundation
 
+/// A protocol that defines methods to handle socket communication events.
 protocol SocketManagerDelegate: AnyObject {
+    /// Called when a new message is received through the socket.
     func didReceiveMessage(_ message: String)
+    
+    /// Called when a socket error occurs.
     func didReceiveSocketError(_ error: String)
 }
 
+/// A singleton class that manages WebSocket connections for real-time chat communication.
 class SocketManager {
     static let shared = SocketManager()
     weak var delegate: SocketManagerDelegate?
@@ -21,6 +26,7 @@ class SocketManager {
         return webSocketTask?.state == .running
     }
 
+    /// Establishes a WebSocket connection.
     public func connect() {
         guard let url = URL(string: PIE_SOCKET_URL) else { return }
         let request = URLRequest(url: url)
@@ -29,6 +35,7 @@ class SocketManager {
         listen()
     }
 
+    /// Starts listening for incoming WebSocket messages.
     private func listen() {
         webSocketTask?.receive { [weak self] result in
             switch result {
@@ -51,6 +58,8 @@ class SocketManager {
         }
     }
 
+    /// Sends a string message over the WebSocket connection.
+    /// - Parameter message: The message string to send.
     func send(message: String) {
         webSocketTask?.send(.string(message)) { error in
             if let error = error {
@@ -62,6 +71,7 @@ class SocketManager {
         }
     }
 
+    /// Disconnects the WebSocket connection.
     func disconnect() {
         webSocketTask?.cancel(with: .goingAway, reason: nil)
     }

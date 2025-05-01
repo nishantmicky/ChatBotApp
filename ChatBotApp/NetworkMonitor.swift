@@ -8,6 +8,7 @@
 import Foundation
 import Network
 
+/// A singleton class responsible for monitoring the network connectivity status of the device.
 class NetworkMonitor {
     static let shared = NetworkMonitor()
 
@@ -26,6 +27,7 @@ class NetworkMonitor {
         monitor = NWPathMonitor()
     }
     
+    /// Starts monitoring network changes.
     public func startMonitoring() {
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self = self else { return }
@@ -46,6 +48,7 @@ class NetworkMonitor {
         monitor.start(queue: monitorQueue)
     }
     
+    /// Stops monitoring network changes.
     public func stopMonitoring() {
         monitor.cancel()
     }

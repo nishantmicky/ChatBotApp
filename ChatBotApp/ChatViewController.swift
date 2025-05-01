@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 
+/// A view controller responsible for displaying and managing the chat interface,
 class ChatViewController: UIViewController {
 
     // MARK: - UI Elements
@@ -54,6 +55,7 @@ class ChatViewController: UIViewController {
         SocketManager.shared.disconnect()
     }
     
+    /// Adds observers for network and keyboard notifications.
     private func addNotificationObservers() {
         NotificationCenter.default.addObserver(
             self,
@@ -124,6 +126,7 @@ class ChatViewController: UIViewController {
         noInternetLabel.translatesAutoresizingMaskIntoConstraints = false
     }
     
+    /// Sets up Auto Layout constraints for all subviews.
     private func setUpConstraints() {
         NSLayoutConstraint.activate([
             noChatsLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -150,6 +153,7 @@ class ChatViewController: UIViewController {
     
     // MARK: - Action helper
 
+    /// Called when Send button is tapped.
     @objc private func sendTapped() {
         guard let text = messageTextField.text, !text.isEmpty else { return }
 
@@ -168,6 +172,7 @@ class ChatViewController: UIViewController {
         }
     }
     
+    /// Called when the network status changes; resends unsent messages if online.
     @objc private func networkStatusChanged() {
         if NetworkMonitor.shared.isConnected {
             noInternetLabel.isHidden = true
@@ -217,6 +222,9 @@ class ChatViewController: UIViewController {
         }
     }
     
+    // MARK: - Keyboard Handling
+
+    /// Adjusts UI when the keyboard appears.
     @objc private func keyboardWillShow(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
@@ -233,6 +241,7 @@ class ChatViewController: UIViewController {
         }
     }
 
+    /// Resets UI when the keyboard is dismissed.
     @objc private func keyboardWillHide(notification: Notification) {
         guard let userInfo = notification.userInfo else { return }
         let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
@@ -244,6 +253,7 @@ class ChatViewController: UIViewController {
         }
     }
     
+    /// Dismisses keyboard when tapping outside the input field.
     @objc private func handleTapOutsideInput(_ gesture: UITapGestureRecognizer) {
         let location = gesture.location(in: view)
         if !messageInputContainer.frame.contains(location) {
